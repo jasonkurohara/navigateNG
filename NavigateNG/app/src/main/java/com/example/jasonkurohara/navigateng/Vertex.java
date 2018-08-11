@@ -9,7 +9,6 @@ public class Vertex extends Graph{
 
     private ArrayList<Vertex> neighbors;
 
-
     public int getX(){
         return x;
     }
@@ -35,8 +34,6 @@ public class Vertex extends Graph{
     }
 
     public boolean isConnected(  Vertex end ){
-
-
         for( Edge currentEdge: allEdges ){
             ArrayList<Vertex> connections = new ArrayList<Vertex>();
             connections = currentEdge.getConnections();

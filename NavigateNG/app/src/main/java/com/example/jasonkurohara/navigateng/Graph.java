@@ -1,11 +1,14 @@
 package com.example.jasonkurohara.navigateng;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Graph{
 
-    public ArrayList<Edge> allEdges = new ArrayList<Edge>();
-    public ArrayList<Vertex> allVertex = new ArrayList<Vertex>();
+
+    public Set<Edge> allEdges = new HashSet<Edge>();
+    public Set<Vertex> allVertex = new HashSet<Vertex>();
 
     public void addEdge( Edge edge ){
         allEdges.add( edge );
@@ -19,7 +22,6 @@ public class Graph{
 
         ArrayList< Vertex > neighbors = new ArrayList<Vertex>();
         for( Vertex current : allVertex  ){
-
             if( start.isConnected(current) ) {
                 neighbors.add(current);
             }
@@ -27,15 +29,15 @@ public class Graph{
         return neighbors;
     }
 
-    public ArrayList<Edge> getAllEdges(){
+    public Set<Edge> getAllEdges(){
         return allEdges;
     }
 
-    public ArrayList<Vertex> getAllVertex() {
+    public Set<Vertex> getAllVertex() {
         return allVertex;
     }
 
-    public Vertex findVertex(String vertName){
+    public Vertex findVertex(String vertName){ //any faster
         for( Vertex current : allVertex ){
             if(vertName.equals(current.getName())){
                 return current;
