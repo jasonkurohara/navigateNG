@@ -33,6 +33,10 @@ public class Vertex extends Graph{
         y = ycoord;
     }
 
+    public void addNeighbor(Vertex neighbor){
+        neighbors.add(neighbor);
+    }
+
     public boolean isConnected(  Vertex end ){
         for( Edge currentEdge: allEdges ){
             ArrayList<Vertex> connections = new ArrayList<Vertex>();
@@ -42,5 +46,9 @@ public class Vertex extends Graph{
             }
         }
         return false;
+    }
+
+    public void addNeighbors(Vertex neighbor){
+        neighbors.add(neighbor);
     }
 }

@@ -7,7 +7,7 @@ public class Edge {
 
     private Vertex start;
     private Vertex end;
-    private int cost;
+    private double cost;
 
     public void setStart(Vertex a){
         start = a;
@@ -17,7 +17,7 @@ public class Edge {
         end = a;
     }
 
-    public void setCost(int weight){
+    public void setCost(double weight){
         cost = weight;
     }
 
@@ -29,7 +29,15 @@ public class Edge {
         return connections;
     }
 
-    public int getCost(){
+    public Vertex getStart(){
+        return start;
+    }
+
+    public Vertex getEnd() {
+        return end;
+    }
+
+    public double getCost(){
         return cost;
     }
 }

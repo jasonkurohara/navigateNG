@@ -1,5 +1,6 @@
 package com.example.jasonkurohara.navigateng;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,5 +45,23 @@ public class Graph{
             }
         }
         return null;
+    }
+
+    public void loadNeighbors(){
+
+        for( Vertex currentVert: allVertex){ //Look for edges that contain currrent Vert
+            for(Edge currentEdge: allEdges){
+                ArrayList<Vertex> connections = new ArrayList<Vertex>();
+                connections = currentEdge.getConnections();
+                if(connections.contains(currentVert)){ //If contained, add opposite vertex as neighbor
+                    if(currentVert.equals(currentEdge.getStart())){
+                        currentVert.addNeighbor(currentEdge.getEnd());
+                    }
+                    else{
+                        currentVert .addNeighbor(currentEdge.getStart());
+                    }
+                }
+            }
+        }
     }
 }

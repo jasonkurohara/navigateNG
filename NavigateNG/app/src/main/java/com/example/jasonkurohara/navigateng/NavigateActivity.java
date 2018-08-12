@@ -28,8 +28,6 @@ public class NavigateActivity extends AppCompatActivity {
         navigateAnimation = new Activity_Navigate_Layout(this);
         setContentView(navigateAnimation);
 
-
-
     }
 
 

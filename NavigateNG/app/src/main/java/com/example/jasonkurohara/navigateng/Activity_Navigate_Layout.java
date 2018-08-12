@@ -7,6 +7,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.View;
 
+import javax.security.auth.DestroyFailedException;
+
 public class Activity_Navigate_Layout extends View {
 
     Paint red_paintbrush_fill, blue_paintbrush_fill, green_paintbrush_fill;
@@ -47,10 +49,11 @@ public class Activity_Navigate_Layout extends View {
         rectangle001.set(210,125,250,175);
         canvas.drawRect(rectangle001, green_paintbrush_stroke);
 
+
     }
 
     public Activity_Navigate_Layout(Context context) {
         super(context);
-        setBackgroundResource(R.drawable.map);
+      //  setBackgroundResource();
     }
 }
