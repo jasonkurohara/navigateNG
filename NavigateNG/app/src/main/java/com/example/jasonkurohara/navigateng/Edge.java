@@ -3,41 +3,32 @@ package com.example.jasonkurohara.navigateng;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+enum Direction {N,S,E,W};
+
 public class Edge {
 
-    private Vertex start;
-    private Vertex end;
+    private Vertex dest;
     private double cost;
+    private Direction direction;
 
-    public void setStart(Vertex a){
-        start = a;
+    public Edge(Vertex destination, double distance) {
+        dest = destination;
+        cost = distance;
     }
 
-    public void setEnd(Vertex a){
-        end = a;
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
-    public void setCost(double weight){
-        cost = weight;
+    public Vertex getDest() {
+        return dest;
     }
 
-
-    public ArrayList<Vertex> getConnections(){
-        ArrayList<Vertex> connections = new ArrayList<Vertex>();
-        connections.add(start);
-        connections.add(end);
-        return connections;
-    }
-
-    public Vertex getStart(){
-        return start;
-    }
-
-    public Vertex getEnd() {
-        return end;
-    }
-
-    public double getCost(){
+    public double getCost() {
         return cost;
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
 }
