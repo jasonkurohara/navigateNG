@@ -3,31 +3,61 @@ package com.example.jasonkurohara.navigateng;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.io.File;
+import java.util.Scanner;
 
 public class Graph{
 
 
     public Set<Edge> allEdges = new HashSet<Edge>();
-    public Set<Vertex> allVertex = new HashSet<Vertex>();
+    public Set<Vertex> allVertices = new HashSet<Vertex>();
 
-    public void addEdge( Edge edge ){
+    public void addEdge(Edge edge ){
         allEdges.add( edge );
     }
 
     public void addVertex( Vertex vertex){
-        allVertex.add( vertex );
+        allVertices.add( vertex );
     }
 
-    public ArrayList< Vertex > getNeighbors( Vertex start ){
+    public void buildGraph(String fileName) throws Exception {
+        File file = new File(fileName);
+        Scanner sc = new Scanner(file);
 
-        ArrayList< Vertex > neighbors = new ArrayList<Vertex>();
-        for( Vertex current : allVertex  ){
-            if( start.isConnected(current) ) {
-                neighbors.add(current);
+
+        //Figure out how to read the text file with different delimiters
+        //FOR TEXT UNDER VERTICES:
+        String name = "";
+        int x = 0, y = 0;
+        //Get whatever info from the file
+        addVertex(new Vertex(x,y,name));
+        //FOR TEXT UNDER EDGES
+        Vertex a = new Vertex(),b = new Vertex();
+        Boolean afound = false, bfound = false;
+        Iterator<Vertex> itr = allVertices.iterator();
+        while (itr.hasNext()) {
+            a = itr.next();
+            if (a.getName().equals("pointa")) {
+            itr.remove();
+            afound = true;
             }
         }
-        return neighbors;
+        itr = allVertices.iterator();
+        while (itr.hasNext()) {
+            b = itr.next();
+            if (b.getName().equals("pointb")){
+                itr.remove();
+                bfound = true;
+            }
+
+        }
+        if (afound && bfound) {
+            a.addNeighbor(b);
+            b.addNeighbor(a);
+        }
+        else {/*connection doesn't exist*/}
     }
 
     public Set<Edge> getAllEdges(){
@@ -35,11 +65,11 @@ public class Graph{
     }
 
     public Set<Vertex> getAllVertex() {
-        return allVertex;
+        return allVertices;
     }
 
     public Vertex findVertex(String vertName){ //any faster
-        for( Vertex current : allVertex ){
+        for( Vertex current : allVertices ){
             if(vertName.equals(current.getName())){
                 return current;
             }
@@ -47,21 +77,4 @@ public class Graph{
         return null;
     }
 
-    public void loadNeighbors(){
-
-        for( Vertex currentVert: allVertex){ //Look for edges that contain currrent Vert
-            for(Edge currentEdge: allEdges){
-                ArrayList<Vertex> connections = new ArrayList<Vertex>();
-                connections = currentEdge.getConnections();
-                if(connections.contains(currentVert)){ //If contained, add opposite vertex as neighbor
-                    if(currentVert.equals(currentEdge.getStart())){
-                        currentVert.addNeighbor(currentEdge.getEnd());
-                    }
-                    else{
-                        currentVert .addNeighbor(currentEdge.getStart());
-                    }
-                }
-            }
-        }
-    }
 }
