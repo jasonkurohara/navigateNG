@@ -1,13 +1,23 @@
 package com.example.jasonkurohara.navigateng;
-
+import android.util.Pair;
 import java.util.ArrayList;
 
 public class Vertex extends Graph{
     private int x;
     private int y;
     private String name;
+    private ArrayList<Edge> neighbors;
 
-    private ArrayList<Vertex> neighbors;
+    public Vertex() {
+        x = 0;
+        y = 0;
+        name = "";
+    }
+    public Vertex(int x, int y, String name) {
+        this.x = x;
+        this.y = y;
+        this.name = name;
+    }
 
     public int getX(){
         return x;
@@ -34,21 +44,12 @@ public class Vertex extends Graph{
     }
 
     public void addNeighbor(Vertex neighbor){
-        neighbors.add(neighbor);
+        double distance = Math.hypot(this.x - neighbor.x ,this.y - neighbor.y);
+        neighbors.add(new Edge(neighbor,distance));
+        //compare coordinates to see edge's direction (NSEW)
     }
 
-    public boolean isConnected(  Vertex end ){
-        for( Edge currentEdge: allEdges ){
-            ArrayList<Vertex> connections = new ArrayList<Vertex>();
-            connections = currentEdge.getConnections();
-            if( connections.contains(this) && connections.contains(end) ){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void addNeighbors(Vertex neighbor){
-        neighbors.add(neighbor);
+    public ArrayList<Edge> getNeighbors() {
+        return neighbors;
     }
 }
