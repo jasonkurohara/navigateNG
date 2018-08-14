@@ -6,6 +6,7 @@ public class Vertex extends Graph{
     private int x;
     private int y;
     private String name;
+    private double candidateDistance;
 
     private ArrayList<Vertex> neighbors;
 
@@ -50,5 +51,13 @@ public class Vertex extends Graph{
 
     public void addNeighbors(Vertex neighbor){
         neighbors.add(neighbor);
+    }
+
+    public void setCandidateDistance(double priority){
+        candidateDistance = priority;
+    }
+
+    public double getPriority(){
+        return candidateDistance;
     }
 }

@@ -17,31 +17,27 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
     //Button to navigate to seperate window
     public Button navigate;
     public Button localize;
-    public void initNav(){
-        navigate = (Button) findViewById(R.id.navigate);
-        navigate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent navigateWindow = new Intent(MainActivity.this,NavigateActivity.class);
-                startActivity(navigateWindow);
-            }
-        });
-    }
 
     public void initLocalize(){
         localize = (Button) findViewById(R.id.localize);
@@ -50,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent localizeWindow = new Intent(MainActivity.this,LocalizeActivity.class);
                 startActivity(localizeWindow);
+
             }
         });
 
@@ -57,88 +54,79 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initNav(); //Initialize navigation window
+        // initNav(); //Initialize navigation window
         initLocalize();
+    //    textParser();
+      //  Log.d(TAG, Double.toString(graph.getAllEdges().get(1).getCost()));
     }
 
-    public void textParser(){
-        String data = "";
-        StringBuffer sbuffer = new StringBuffer();
-        InputStream is = this.getResources().openRawResource(R.raw.sample);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        String mapName = "";
-        Graph graph = new Graph();
-        int state = 0;
+    public ArrayList<Vertex> astar ( Graph graph, Vertex start, Vertex end){
+        Comparator<Vertex> comparator = new PriorityComparator();
+        PriorityQueue<Vertex> pqueue = new PriorityQueue<Vertex>(10,comparator);
+        HashMap<Vertex,Double> priorities = new HashMap<Vertex,Double>();
+        ArrayList<Vertex> path = new ArrayList<Vertex>();
 
-        if( is != null){
-            try{
-                while((data=reader.readLine()) != null){
-                    if(  state == 0 ){
-                        if( data.equals("TITLE")) {
-                            continue;
-                        }
-                        mapName = data;
-                        state++;
-                    }
+        priorities.put(start,0.0); //Candidate distance is 0
 
-                    if(   state == 1){
-                        if( data.equals("VERTEX")) {
-                            continue;
-                        }
+        start.setCandidateDistance(distanceFunction(start,end));
+        pqueue.add(start);
+        priorities.put(start,0.0);
 
-                        if( data.equals("EDGES")) {
-                            state++;
-                            continue;
-                        }
-                        //String of vertex name and position
-                        int delimiter = data.indexOf(",");
-                        Vertex newVert = new Vertex();
-                        newVert.setName(data.substring(0,delimiter));
+        Set<Vertex> confirmed = new HashSet<Vertex>(); //green
+        Set<Vertex> unexplored = new HashSet<Vertex>(); //uncolored;
+        Set<Vertex> potential = new HashSet<Vertex>(); //yellow
 
-                        data = data.substring(delimiter+1);
-                        delimiter = data.indexOf(";");
-                        newVert.setX( Integer.parseInt(data.substring(0,delimiter)) );
+        while( !pqueue.isEmpty() ) {
+            Vertex point = new Vertex();
+            point = pqueue.peek(); //Once dequeued, set to confirmed and this is the shortest path (candidate distance cannot be changed)
+            pqueue.remove(point);
+            confirmed.add(point);
 
-                        data = data.substring(delimiter+1);
-                        delimiter = data.indexOf(";");
-                        newVert.setY( Integer.parseInt(data.substring(0,delimiter)) );
+            if (point.equals(end)) {
+                return path;
+            }
 
-                        graph.addVertex(newVert);
-                    }
+            double candidateDistance = priorities.get(point);
 
-                    else if (  state == 2){
-                        int delimiter = data.indexOf(";");
-                        Edge newEdge = new Edge();
+            for (Vertex neighbor : graph.getNeighbors(point)) {
 
-                        //Finds corresponding vertex in allVertex based on name
-                        String vert1name = data.substring(0,delimiter);
-                        data = data.substring(delimiter+1);
-                        delimiter = data.indexOf(";");
-                        String vert2name = data.substring(0, delimiter);
+                double heuristic = distanceFunction(neighbor, end);
 
-                        Vertex start = graph.findVertex(vert1name);
-                        Vertex end = graph.findVertex(vert2name);
-                        newEdge.setEnd(end);
-                        newEdge.setStart(start);
+                if (unexplored.contains(neighbor)) {
+                    unexplored.remove(neighbor);
+                    potential.add(neighbor);
 
-                        double distance = Math.sqrt( Math.pow(start.getX() - end.getX(),2) + Math.pow(start.getY() - end.getY(),2));
-                        newEdge.setCost(distance);
-                        graph.addEdge(newEdge);
-                    }
-                    sbuffer.append(data + "n");
+                    priorities.put(neighbor, candidateDistance + distanceFunction(point, neighbor));
+
+                    neighbor.setCandidateDistance(priorities.get(neighbor) + heuristic);
+                    pqueue.add(neighbor); //simply add
+                } else if (potential.contains(neighbor) && priorities.get(neighbor) > candidateDistance + distanceFunction(point, neighbor)) {
+                    priorities.put(neighbor, candidateDistance + distanceFunction(point, neighbor));
+
+                    pqueue.remove(neighbor);
+                    neighbor.setCandidateDistance(priorities.get(neighbor) + heuristic);
+                    pqueue.add(neighbor); //This is change of prioritiy, so may delete and re add neighbor
+
                 }
-                is.close();
-            } catch(Exception e){
-                e.printStackTrace();
             }
         }
+        return path;
+    }
+
+
+    public class PriorityComparator implements Comparator<Vertex>{
+        @Override
+        public int compare(Vertex start, Vertex end){
+            return (int)(start.getPriority() - end.getPriority());
+        }
+    }
+
+    public double distanceFunction(Vertex start, Vertex end){
+        return Math.sqrt( Math.pow(start.getX() - end.getX(),2) + Math.pow(start.getY() - end.getY(),2));    )
     }
 
 }

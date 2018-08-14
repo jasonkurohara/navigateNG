@@ -11,4 +11,21 @@
     <string name="get_directions">Get directions</string>
     <string name="navigateng">NavigateNG</string>
     <string name="localize">LOCALIZE</string>
+    <string name="navigate">Navigate</string>
+
+    <string name="start">START</string>
+    <string name="end">END</string>
+    <string name="ng_logo">ng logo</string>
+    <string name="ng_string_ng_logo">ng @string/ng_logo</string>
+    <string name="run">RUN</string>
+
+    <string-array name="pointA">
+        <item>start1</item>
+        <item>start2</item>
+    </string-array>
+
+    <string-array name="pointB">
+        <item>end1</item>
+        <item>end2</item>
+    </string-array>
 </resources>

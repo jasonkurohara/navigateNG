@@ -8,8 +8,8 @@ import java.util.Set;
 public class Graph{
 
 
-    public Set<Edge> allEdges = new HashSet<Edge>();
-    public Set<Vertex> allVertex = new HashSet<Vertex>();
+    public ArrayList<Edge> allEdges = new ArrayList<Edge>();
+    public ArrayList<Vertex> allVertex = new ArrayList<>();
 
     public void addEdge( Edge edge ){
         allEdges.add( edge );
@@ -30,11 +30,11 @@ public class Graph{
         return neighbors;
     }
 
-    public Set<Edge> getAllEdges(){
+    public ArrayList<Edge> getAllEdges(){
         return allEdges;
     }
 
-    public Set<Vertex> getAllVertex() {
+    public ArrayList<Vertex> getAllVertex() {
         return allVertex;
     }
 
