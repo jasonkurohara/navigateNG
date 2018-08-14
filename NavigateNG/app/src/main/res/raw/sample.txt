@@ -31,7 +31,7 @@ Corner 422,454,100
 EDGES
 Room 414,Room 412D
 Room 414,Room 416
-Room 412D,Room 412C 
+Room 412D,Room 412C
 Room 412C,Room 412B
 Room 412B,Room 412A
 Room 412A,Room 411
@@ -39,12 +39,12 @@ Room 411,Room 409
 Room 409,T intersection 409 & 407
 T intersection 409 & 407,Room 407
 T intersection 409 & 407,Common Area
-Common Area, Elevator
+Common Area,Elevator
 Elevator,Room 418
 Room 418,Room 416
 Room 420,Room 418
 Room 420,RAD
-RAD, Corner 422
+RAD,Corner 422
 Corner 422,Room 422A
 Room 422A,Room 422B
 Room 422B,Room 422C
