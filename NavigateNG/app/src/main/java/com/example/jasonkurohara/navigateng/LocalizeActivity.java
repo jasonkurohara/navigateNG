@@ -186,50 +186,53 @@ public class LocalizeActivity extends Activity {
                         mapName = data;
                         state++;
                     }
-
-                    if(   state == 1){
+                    else if(   state == 1){
                         if( data.equals("VERTEX")) {
                             continue;
                         }
-
                         if( data.equals("EDGES")) {
                             state++;
                             continue;
                         }
+                        if (!data.equals("EDGES")) {
                         //String of vertex name and position
-                        int delimiter = data.indexOf(",");
-                        Vertex newVert = new Vertex();
-                        newVert.setName(data.substring(0,delimiter));
+                        int delimiter;
+                    	Vertex newVert = new Vertex();
+                        if ((delimiter = data.indexOf(",")) != -1){
+                            newVert.setName(data.substring(0,delimiter));
+                        }
+                        data = data.substring(delimiter+1);
+                        if ((delimiter = data.indexOf(",")) != -1){
+                        	newVert.setX( Integer.parseInt(data.substring(0,delimiter)) );
+                        }
 
                         data = data.substring(delimiter+1);
-                        delimiter = data.indexOf(";");
-                        newVert.setX( Integer.parseInt(data.substring(0,delimiter)) );
-
-                        data = data.substring(delimiter+1);
-                        delimiter = data.indexOf(";");
-                        newVert.setY( Integer.parseInt(data.substring(0,delimiter)) );
-
+                        newVert.setY( Integer.parseInt(data) );
                         graph.addVertex(newVert);
+                        }
                     }
-
                     else if (  state == 2){
-                        int delimiter = data.indexOf(";");
-                        Edge newEdge = new Edge();
-
-                        //Finds corresponding vertex in allVertex based on name
-                        String vert1name = data.substring(0,delimiter);
-                        data = data.substring(delimiter+1);
-                        delimiter = data.indexOf(";");
-                        String vert2name = data.substring(0, delimiter);
-
-                        Vertex start = graph.findVertex(vert1name);
-                        Vertex end = graph.findVertex(vert2name);
-                        newEdge.setEnd(end);
-                        newEdge.setStart(start);
-
-                        double distance = Math.sqrt( Math.pow(start.getX() - end.getX(),2) + Math.pow(start.getY() - end.getY(),2));
-                        newEdge.setCost(distance);
-                        graph.addEdge(newEdge);
+                    	int delimiter;
+                        
+                        if ((delimiter = data.indexOf(",")) != -1){
+	                        //Finds corresponding vertex in allVertex based on name
+                        	String vert1name = data.substring(0,delimiter);
+	                        data = data.substring(delimiter+1);
+	                        String vert2name = data;
+	                        Vertex start = new Vertex();
+	                        start = graph.findVertex(vert1name);
+	                        Vertex end = new Vertex();
+	                        end = graph.findVertex(vert2name);
+	                        //System.out.println("Expected: "+vert1name+","+vert2name);
+	                        if (start != null && end != null) {
+		                        //System.out.println("Result: "+start.getName()+","+end.getName());
+		                        start.addNeighbor(end);
+		                        end.addNeighbor(start);
+		                        double distance = Math.sqrt( Math.pow(start.getX() - end.getX(),2) + Math.pow(start.getY() - end.getY(),2));
+		                        Edge newEdge = new Edge(start,end,distance);
+		                        graph.addEdge(newEdge);
+	                        } 
+                        }
                     }
                     sbuffer.append(data + "n");
                 }
