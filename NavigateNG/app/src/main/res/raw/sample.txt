@@ -1,6 +1,5 @@
 TITLE
 Sample Building Layout
-
 VERTEX
 Room 412D,99,200
 Room 412C,99,245
@@ -27,7 +26,6 @@ East Stairs,458,380
 West Stairs,182,148
 T intersection 409 & 407,280,338
 Corner 422,454,100
-
 EDGES
 Room 414,Room 412D
 Room 414,Room 416

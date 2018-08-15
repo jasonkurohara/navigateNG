@@ -10,6 +10,12 @@ public class Vertex extends Graph{
 
     private ArrayList<Vertex> neighbors;
 
+    public Vertex() {
+        x = y = 0;
+        name = "";
+        candidateDistance = 0;
+    }
+
     public int getX(){
         return x;
     }
@@ -35,22 +41,9 @@ public class Vertex extends Graph{
     }
 
     public void addNeighbor(Vertex neighbor){
-        neighbors.add(neighbor);
-    }
-
-    public boolean isConnected(  Vertex end ){
-        for( Edge currentEdge: allEdges ){
-            ArrayList<Vertex> connections = new ArrayList<Vertex>();
-            connections = currentEdge.getConnections();
-            if( connections.contains(this) && connections.contains(end) ){
-                return true;
-            }
+        if(neighbor != null) {
+            neighbors.add(neighbor);
         }
-        return false;
-    }
-
-    public void addNeighbors(Vertex neighbor){
-        neighbors.add(neighbor);
     }
 
     public void setCandidateDistance(double priority){

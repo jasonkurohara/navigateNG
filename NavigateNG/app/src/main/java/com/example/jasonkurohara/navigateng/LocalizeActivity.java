@@ -31,110 +31,55 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 public class LocalizeActivity extends Activity {
 
-    Graph graph = new Graph();
+    private static final String TAG = "LocalizationActivity";
+
+    Map<Vertex, ArrayList<Integer>> trueMap = new HashMap<Vertex, ArrayList<Integer>>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_localize);
 
-        Button btnONOFF = (Button) findViewById(R.id.btnONOFF);
+        //Load BT device names from text
+        Vector<String> BTDeviceAddresses = new Vector<String>();
+        BTDeviceAddresses = loadBTDevices();
 
-        Spinner pointA = (Spinner) findViewById(R.id.pointA);
+        //Load trueMap from text
+        trueMap = loadBTMapping();
 
-        ArrayAdapter<String> adapterA = new ArrayAdapter<String>(LocalizeActivity.this,
-                android.R.layout.simple_list_item_1,getResources().getStringArray(R.array.pointA));
-
-        adapterA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        pointA.setAdapter(adapterA);
-
-        Spinner pointB = (Spinner) findViewById(R.id.pointB);
-        ArrayAdapter<String> adapterB = new ArrayAdapter<String>(LocalizeActivity.this,
-                android.R.layout.simple_list_item_1,getResources().getStringArray(R.array.pointB));
-
-        adapterB.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        pointB.setAdapter(adapterB);
-
-
+        int PERMISSION_REQUEST_COARSE_LOCATION = 456;
+        BluetoothAdapter mBluetoothAdapter; //Allows discovery, instantiate a BluetoothDevice
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-
-        btnONOFF.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "onClick: enabling/disabling bluetooth.");
-                enableDisableBT();
-            }
-        });
-
-    }
-    private static final String TAG = "LocalizationActivity";
-    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 456;
-    BluetoothAdapter mBluetoothAdapter; //Allows discovery, instantiate a BluetoothDevice
-
-    // Create a BroadcastReceiver for ACTION_FOUND
-    private final BroadcastReceiver mBroadcastReceiver1 = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-            // When discovery finds a device, multiple states of BT on device
-            if (action.equals(mBluetoothAdapter.ACTION_STATE_CHANGED)) {
-                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, mBluetoothAdapter.ERROR);
-                switch(state){
-                    case BluetoothAdapter.STATE_OFF:
-                        Log.d(TAG, "onReceive: STATE OFF");
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_OFF:
-                        Log.d(TAG, "mBroadcastReceiver1: STATE TURNING OFF");
-                        break;
-                    case BluetoothAdapter.STATE_ON:
-                        Log.d(TAG, "mBroadcastReceiver1: STATE ON");
-                        BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
-                        }
-
-                        //Adding filter called builder
-                        ScanFilter.Builder builder = new ScanFilter.Builder();
-                        builder.setDeviceAddress("9C:1D:58:94:3D:3F"); //Specific to my BLE device
-
-                        //Adding builders to filter
-                        List<ScanFilter> filter = new ArrayList<ScanFilter>();
-                        filter.add(builder.build());
-
-                        //Improving scan speed
-                        ScanSettings.Builder settings = new ScanSettings.Builder();
-                        settings.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
-
-                        //Start discovery
-                        scanner.startScan(filter, settings.build(), callback );
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        Log.d(TAG, "mBroadcastReceiver1: STATE TURNING ON");
-                        break;
-                }
-            }
+        BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
         }
-    };
 
-    public void enableDisableBT(){
-        if(mBluetoothAdapter == null){
-            Log.d(TAG, "enableDisableBT: Does not have BT capabilities.");
-        }
-        if(!mBluetoothAdapter.isEnabled()){
-            Log.d(TAG, "enableDisableBT: enabling BT.");
-            Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivity(enableBTIntent);
+        //Adding filter called builder
+        ScanFilter.Builder builder = new ScanFilter.Builder();
+        builder.setDeviceAddress("9C:1D:58:94:3D:3F"); //Specific to my BLE device
 
-            IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-            registerReceiver(mBroadcastReceiver1, BTIntent);
-        }
+        //Adding builders to filter
+        List<ScanFilter> filter = new ArrayList<ScanFilter>();
+        filter.add(builder.build());
+
+        //Improving scan speed
+        ScanSettings.Builder settings = new ScanSettings.Builder();
+        settings.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
+
+        //Start discovery
+        scanner.startScan(filter, settings.build(),  callback);
     }
 
-    private ScanCallback callback = new ScanCallback() {
+    //Callback function executed when result detected
+    public ScanCallback callback =  new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             //   System.out.println("BLE// onScanResult");
@@ -154,7 +99,7 @@ public class LocalizeActivity extends Activity {
 
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
-           // System.out.println("BLE// onBatchScanResults");
+            // System.out.println("BLE// onBatchScanResults");
             for (ScanResult sr : results) {
                 Log.i("ScanResult - Results", sr.toString());
             }
@@ -167,76 +112,55 @@ public class LocalizeActivity extends Activity {
         }
     };
 
-    public void textParser(){
+    //Loads in bluetooth device names
+    public Vector<String> loadBTDevices(){
         String data = "";
         StringBuffer sbuffer = new StringBuffer();
-        InputStream is = this.getResources().openRawResource(R.raw.sample);
+        InputStream is = this.getResources().openRawResource(R.raw.sample2); //Change to device names
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        String mapName = "";
-
-        int state = 0;
+        Vector<String> devices = new Vector<String>();
 
         if( is != null){
             try{
-                while((data=reader.readLine()) != null){
-                    if(  state == 0 ){
-                        if( data.equals("TITLE")) {
-                            continue;
-                        }
-                        mapName = data;
-                        state++;
-                    }
-
-                    if(   state == 1){
-                        if( data.equals("VERTEX")) {
-                            continue;
-                        }
-
-                        if( data.equals("EDGES")) {
-                            state++;
-                            continue;
-                        }
-                        //String of vertex name and position
-                        int delimiter = data.indexOf(",");
-                        Vertex newVert = new Vertex();
-                        newVert.setName(data.substring(0,delimiter));
-
-                        data = data.substring(delimiter+1);
-                        delimiter = data.indexOf(";");
-                        newVert.setX( Integer.parseInt(data.substring(0,delimiter)) );
-
-                        data = data.substring(delimiter+1);
-                        delimiter = data.indexOf(";");
-                        newVert.setY( Integer.parseInt(data.substring(0,delimiter)) );
-
-                        graph.addVertex(newVert);
-                    }
-
-                    else if (  state == 2){
-                        int delimiter = data.indexOf(";");
-                        Edge newEdge = new Edge();
-
-                        //Finds corresponding vertex in allVertex based on name
-                        String vert1name = data.substring(0,delimiter);
-                        data = data.substring(delimiter+1);
-                        delimiter = data.indexOf(";");
-                        String vert2name = data.substring(0, delimiter);
-
-                        Vertex start = graph.findVertex(vert1name);
-                        Vertex end = graph.findVertex(vert2name);
-                        newEdge.setEnd(end);
-                        newEdge.setStart(start);
-
-                        double distance = Math.sqrt( Math.pow(start.getX() - end.getX(),2) + Math.pow(start.getY() - end.getY(),2));
-                        newEdge.setCost(distance);
-                        graph.addEdge(newEdge);
-                    }
-                    sbuffer.append(data + "n");
+                while( (data=reader.readLine()) != null){
+                    devices.add(data);
                 }
                 is.close();
             } catch(Exception e){
                 e.printStackTrace();
             }
         }
+        return devices;
+    }
+
+    //Loads in truth data
+    public Map<Vertex, ArrayList<Integer>> loadBTMapping(){
+        Map<Vertex,ArrayList<Integer>> map = new HashMap<Vertex,ArrayList<Integer>>();
+
+        String data = "";
+        StringBuffer sbuffer = new StringBuffer();
+        InputStream is = this.getResources().openRawResource(R.raw.sample2); //Change to device names
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+   //     Vector<String> devices = new Vector<String>();
+
+        if( is != null){
+            try{
+                while( (data=reader.readLine()) != null){
+                    ArrayList<Integer> signals = new ArrayList<Integer>();
+                    int delimiter = data.indexOf(";");
+                    Vertex gridBox = new Vertex();
+                    gridBox.setName(data.substring(0,delimiter));
+                    data = data.substring(delimiter+1);
+                    while( (delimiter = data.indexOf(",")) !=  -1) {
+                        signals.add(Integer.parseInt(data.substring(0,delimiter)));
+                    }
+                    map.put(gridBox,signals);
+                }
+                is.close();
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        return map;
     }
 }

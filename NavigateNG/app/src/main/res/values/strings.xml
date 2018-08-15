@@ -18,6 +18,8 @@
     <string name="ng_logo">ng logo</string>
     <string name="ng_string_ng_logo">ng @string/ng_logo</string>
     <string name="run">RUN</string>
+    <string name="go">GO</string>
+    <string name="todo">TODO</string>
 
     <string-array name="pointA">
         <item>start1</item>

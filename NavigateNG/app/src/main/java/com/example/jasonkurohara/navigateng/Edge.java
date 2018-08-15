@@ -9,6 +9,18 @@ public class Edge {
     private Vertex end;
     private double cost;
 
+    public Edge() {
+        start = null;
+        end = null;
+        cost = 0;
+    }
+
+    public Edge(Vertex a, Vertex b, double dist) {
+        start = a;
+        end = b;
+        cost = dist;
+    }
+
     public void setStart(Vertex a){
         start = a;
     }
@@ -19,14 +31,6 @@ public class Edge {
 
     public void setCost(double weight){
         cost = weight;
-    }
-
-
-    public ArrayList<Vertex> getConnections(){
-        ArrayList<Vertex> connections = new ArrayList<Vertex>();
-        connections.add(start);
-        connections.add(end);
-        return connections;
     }
 
     public Vertex getStart(){

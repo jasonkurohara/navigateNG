@@ -19,17 +19,6 @@ public class Graph{
         allVertex.add( vertex );
     }
 
-    public ArrayList< Vertex > getNeighbors( Vertex start ){
-
-        ArrayList< Vertex > neighbors = new ArrayList<Vertex>();
-        for( Vertex current : allVertex  ){
-            if( start.isConnected(current) ) {
-                neighbors.add(current);
-            }
-        }
-        return neighbors;
-    }
-
     public ArrayList<Edge> getAllEdges(){
         return allEdges;
     }
@@ -47,21 +36,4 @@ public class Graph{
         return null;
     }
 
-    public void loadNeighbors(){
-
-        for( Vertex currentVert: allVertex){ //Look for edges that contain currrent Vert
-            for(Edge currentEdge: allEdges){
-                ArrayList<Vertex> connections = new ArrayList<Vertex>();
-                connections = currentEdge.getConnections();
-                if(connections.contains(currentVert)){ //If contained, add opposite vertex as neighbor
-                    if(currentVert.equals(currentEdge.getStart())){
-                        currentVert.addNeighbor(currentEdge.getEnd());
-                    }
-                    else{
-                        currentVert .addNeighbor(currentEdge.getStart());
-                    }
-                }
-            }
-        }
-    }
 }
