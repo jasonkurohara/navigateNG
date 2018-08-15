@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity  {
 
         String data = "";
         StringBuffer sbuffer = new StringBuffer();
-        InputStream is = this.getResources().openRawResource(R.raw.sample2);
+        InputStream is = this.getResources().openRawResource(R.raw.sample);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
         Vector<String> str = new Vector<String>();
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity  {
     public  Graph textParser() {
         String data = "";
         StringBuffer sbuffer = new StringBuffer();
-        InputStream is = this.getResources().openRawResource(R.raw.sample);
+        InputStream is = this.getResources().openRawResource(R.raw.vertandedges);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         String mapName = "";
         Graph graph = new Graph();
@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity  {
                         if (!data.equals("EDGES")) {
                             int delimiter = 0;
                             Vertex newVert = new Vertex();
-                            if ((delimiter = data.indexOf(",")) != -1) {
+                            if ((delimiter = data.indexOf(";")) != -1) {
                                 newVert.setName(data.substring(0, delimiter));
                             }
                             data = data.substring(delimiter + 1);

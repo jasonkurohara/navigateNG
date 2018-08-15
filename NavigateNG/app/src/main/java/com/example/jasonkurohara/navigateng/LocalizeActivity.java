@@ -33,7 +33,7 @@ import java.util.Vector;
 public class LocalizeActivity extends Activity {
 
     /************************************CONSTANTS*************************************************/
-    public static final String MODULE_1 = "ENTER NAME 1"; //MODULE NAMES
+    public static final String MODULE_1 = "9C:1D:58:94:3D:3F"; //MODULE NAMES
     public static final String MODULE_2 = "ENTER NAME 2";
     public static final String MODULE_3 = "ENTER NAME 3";
     public static final String MODULE_4 = "ENTER NAME 4";
@@ -62,9 +62,6 @@ public class LocalizeActivity extends Activity {
         //Load trueMap from text
         trueMap = loadBTMapping();
 
-//        //Load BT device names from text
-//        BTDeviceAddresses = loadBTDevices();
-
         //DECOMPOSE TO ONE FUNCTION???
         BluetoothAdapter mBluetoothAdapter; //Allows discovery, instantiate a BluetoothDevice
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -74,13 +71,34 @@ public class LocalizeActivity extends Activity {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
         }
 
-        //Adding filter called builder
-        ScanFilter.Builder builder = new ScanFilter.Builder();
-        builder.setDeviceAddress("9C:1D:58:94:3D:3F"); //Specific to my BLE device
+        //Adding all filters to build
+        ScanFilter.Builder builder1 = new ScanFilter.Builder();
+        builder1.setDeviceAddress(MODULE_1); //Specific to my BLE device
+        ScanFilter.Builder builder2 = new ScanFilter.Builder();
+        builder2.setDeviceAddress(MODULE_2);
+        ScanFilter.Builder builder3 = new ScanFilter.Builder();
+        builder3.setDeviceAddress(MODULE_3);
+        ScanFilter.Builder builder4 = new ScanFilter.Builder();
+        builder4.setDeviceAddress(MODULE_4);
+        ScanFilter.Builder builder5 = new ScanFilter.Builder();
+        builder5.setDeviceAddress(MODULE_5);
+        ScanFilter.Builder builder6 = new ScanFilter.Builder();
+        builder6.setDeviceAddress(MODULE_6);
+        ScanFilter.Builder builder7 = new ScanFilter.Builder();
+        builder7.setDeviceAddress(MODULE_7);
+        ScanFilter.Builder builder8 = new ScanFilter.Builder();
+        builder8.setDeviceAddress(MODULE_8);
 
         //Adding builders to filter
         List<ScanFilter> filter = new ArrayList<ScanFilter>();
-        filter.add(builder.build());
+        filter.add(builder1.build());
+        filter.add(builder2.build());
+        filter.add(builder3.build());
+        filter.add(builder4.build());
+        filter.add(builder5.build());
+        filter.add(builder6.build());
+        filter.add(builder7.build());
+        filter.add(builder8.build());
 
         //Improving scan speed
         ScanSettings.Builder settings = new ScanSettings.Builder();
@@ -158,7 +176,7 @@ public class LocalizeActivity extends Activity {
 
         String data = "";
         StringBuffer sbuffer = new StringBuffer();
-        InputStream is = this.getResources().openRawResource(R.raw.trueMap); //Change to device names
+        InputStream is = this.getResources().openRawResource(R.raw.truemap); //Change to device names
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
         if (is != null) {
