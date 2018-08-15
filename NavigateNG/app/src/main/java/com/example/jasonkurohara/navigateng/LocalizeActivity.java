@@ -13,22 +13,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.renderscript.ScriptC;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Adapter;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
-import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,24 +32,40 @@ import java.util.Vector;
 
 public class LocalizeActivity extends Activity {
 
-    private static final String TAG = "LocalizationActivity";
+    /************************************CONSTANTS*************************************************/
+    public static final String MODULE_1 = "ENTER NAME 1"; //MODULE NAMES
+    public static final String MODULE_2 = "ENTER NAME 2";
+    public static final String MODULE_3 = "ENTER NAME 3";
+    public static final String MODULE_4 = "ENTER NAME 4";
+    public static final String MODULE_5 = "ENTER NAME 5";
+    public static final String MODULE_6 = "ENTER NAME 6";
+    public static final String MODULE_7 = "ENTER NAME 7";
+    public static final String MODULE_8 = "ENTER NAME 8";
+    public static final String MODULE_9 = "ENTER NAME 9";
+    private static final String TAG = "LocalizationActivity"; //TAG FOR CONSOLE LOGGING
+    public static final int SCAN_COUNT = 5; //SCAN UPDATE (AVERAGE)
+    public static final int NUM_DEVICES = 9; //NUMBER OF TOTAL BT DEVICES
+    public static final int PERMISSION_REQUEST_COARSE_LOCATION = 456; //PERMISSION CODE FOR BT
+    public static final int ERROR_THRESHOLD = 5; //ERROR THRESHOLD IN -dBM
 
+    /**************************************OBJECTS*************************************************/
     Map<Vertex, ArrayList<Integer>> trueMap = new HashMap<Vertex, ArrayList<Integer>>();
+    Vector<String> BTDeviceAddresses = new Vector<String>();
 
+    /**************************************METHODS*************************************************/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_localize);
 
-        //Load BT device names from text
-        Vector<String> BTDeviceAddresses = new Vector<String>();
-        BTDeviceAddresses = loadBTDevices();
-
         //Load trueMap from text
         trueMap = loadBTMapping();
 
-        int PERMISSION_REQUEST_COARSE_LOCATION = 456;
+//        //Load BT device names from text
+//        BTDeviceAddresses = loadBTDevices();
+
+        //DECOMPOSE TO ONE FUNCTION???
         BluetoothAdapter mBluetoothAdapter; //Allows discovery, instantiate a BluetoothDevice
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -75,11 +87,11 @@ public class LocalizeActivity extends Activity {
         settings.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
 
         //Start discovery
-        scanner.startScan(filter, settings.build(),  callback);
+        scanner.startScan(filter, settings.build(), callback);
     }
 
-    //Callback function executed when result detected
-    public ScanCallback callback =  new ScanCallback() {
+/************************************CALLBACK FUNCTIONS********************************************/
+    public ScanCallback callback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             //   System.out.println("BLE// onScanResult");
@@ -100,8 +112,15 @@ public class LocalizeActivity extends Activity {
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
             // System.out.println("BLE// onBatchScanResults");
-            for (ScanResult sr : results) {
-                Log.i("ScanResult - Results", sr.toString());
+            ArrayList<List<ScanResult>> queue = new ArrayList<>(); //Stores circular queue of max 5 readings from 9 devices
+
+            ArrayList<ScanResult>  orderedDevices = new ArrayList<>(); //Sorts devices in module name order
+            orderedDevices = sortEntry(results);
+
+            ArrayList<Double> average = new ArrayList<Double>();
+            average = moving_average(orderedDevices, queue);
+            for(int i = 0; i < average.size(); i++){
+                Log.d(TAG,Double.toString(average.get(i)));
             }
         }
 
@@ -112,55 +131,119 @@ public class LocalizeActivity extends Activity {
         }
     };
 
-    //Loads in bluetooth device names
-    public Vector<String> loadBTDevices(){
+//    //Loads in bluetooth device names
+//    public Vector<String> loadBTDevices() {
+//        String data = "";
+//        StringBuffer sbuffer = new StringBuffer();
+//        InputStream is = this.getResources().openRawResource(R.raw.sample2); //Change to device names
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+//        Vector<String> devices = new Vector<String>();
+//
+//        if (is != null) {
+//            try {
+//                while ((data = reader.readLine()) != null) {
+//                    devices.add(data);
+//                }
+//                is.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return devices;
+//    }
+
+    //Loads in truth data to truMap
+    public Map<Vertex, ArrayList<Integer>> loadBTMapping() {
+        Map<Vertex, ArrayList<Integer>> map = new HashMap<Vertex, ArrayList<Integer>>();
+
         String data = "";
         StringBuffer sbuffer = new StringBuffer();
-        InputStream is = this.getResources().openRawResource(R.raw.sample2); //Change to device names
+        InputStream is = this.getResources().openRawResource(R.raw.trueMap); //Change to device names
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        Vector<String> devices = new Vector<String>();
 
-        if( is != null){
-            try{
-                while( (data=reader.readLine()) != null){
-                    devices.add(data);
-                }
-                is.close();
-            } catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-        return devices;
-    }
-
-    //Loads in truth data
-    public Map<Vertex, ArrayList<Integer>> loadBTMapping(){
-        Map<Vertex,ArrayList<Integer>> map = new HashMap<Vertex,ArrayList<Integer>>();
-
-        String data = "";
-        StringBuffer sbuffer = new StringBuffer();
-        InputStream is = this.getResources().openRawResource(R.raw.sample2); //Change to device names
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-   //     Vector<String> devices = new Vector<String>();
-
-        if( is != null){
-            try{
-                while( (data=reader.readLine()) != null){
+        if (is != null) {
+            try {
+                while ((data = reader.readLine()) != null) {
                     ArrayList<Integer> signals = new ArrayList<Integer>();
                     int delimiter = data.indexOf(";");
                     Vertex gridBox = new Vertex();
-                    gridBox.setName(data.substring(0,delimiter));
-                    data = data.substring(delimiter+1);
-                    while( (delimiter = data.indexOf(",")) !=  -1) {
-                        signals.add(Integer.parseInt(data.substring(0,delimiter)));
+                    gridBox.setName(data.substring(0, delimiter));
+                    data = data.substring(delimiter + 1);
+                    while ((delimiter = data.indexOf(",")) != -1) {
+                        signals.add(Integer.parseInt(data.substring(0, delimiter)));
                     }
-                    map.put(gridBox,signals);
+                    map.put(gridBox, signals);
                 }
                 is.close();
-            } catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         return map;
+    }
+
+    //Moving average function
+    public ArrayList<Double> moving_average(List<ScanResult> entry, ArrayList<List<ScanResult>> queue) {
+        if( queue.size() < SCAN_COUNT){ //If not big enough sample, add to queue and calculate avg
+            queue.add(entry);
+        }
+
+        else{
+            queue.remove(0); //Too large, so remove and calc average
+            queue.add(entry);
+        }
+        return calcAverage(queue); //Improvement: store average variable to reduce # of calculations
+    }
+
+    //Finds closest box according to trueMap and within threshold
+    public Vertex findClosestGrid(ArrayList<Double> userScan, int threshold) {
+        boolean flag = false;
+        for (Vertex curr : trueMap.keySet()) {
+            ArrayList<Integer> current = trueMap.get(curr);
+            for (int i = 0; i < userScan.size(); i++) {
+                if (Math.abs(userScan.get(i) - current.get(i)) > threshold) {
+                    flag = true; //Flag triggered if NOT a valid square
+                }
+            }
+            if ( !flag ){ //If within threshold for ALL modules, this is the closest square
+                return curr;
+            }
+        }
+        return null; //Returns null if user position not found
+    }
+
+    //Sorts BT devices in order module 1 to 8
+    public ArrayList<ScanResult> sortEntry(List<ScanResult>results){
+        ArrayList<ScanResult> sorted = new ArrayList<ScanResult>();
+        for(ScanResult curr: results){
+            String currentDeviceName = curr.getDevice().getAddress();
+            switch(currentDeviceName){
+
+                case MODULE_1: sorted.add(0,curr); break;
+                case MODULE_2: sorted.add(1, curr); break;
+                case MODULE_3: sorted.add(2, curr); break;
+                case MODULE_4: sorted.add(3, curr); break;
+                case MODULE_5: sorted.add(4, curr); break;
+                case MODULE_6: sorted.add(5, curr); break;
+                case MODULE_7: sorted.add(6, curr); break;
+                case MODULE_8: sorted.add(7, curr); break;
+                default: System.out.println("ERROR");
+            }
+        }
+        return sorted;
+    }
+
+    public ArrayList<Double> calcAverage(ArrayList<List<ScanResult>> queue){
+        ArrayList<Double> average = new ArrayList<>();
+        double avg = 0;
+        int sum = 0;
+        for(int i = 0; i < NUM_DEVICES; i++){ //Loop each successive scan
+            for( int j = 0; j < SCAN_COUNT; j++){ //Loop through each device ~(1-9)
+                sum += queue.get(j).get(i).getRssi();
+            }
+            avg = (double)sum/queue.size();
+            average.add(avg);
+        }
+        return average;
     }
 }

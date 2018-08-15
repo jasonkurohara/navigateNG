@@ -27,7 +27,7 @@ public class Graph{
         return allVertex;
     }
 
-    public Vertex findVertex(String vertName){ //any faster
+    public Vertex findVertex(String vertName){
         for( Vertex current : allVertex ){
             if(vertName.equals(current.getName())){
                 return current;
@@ -35,5 +35,4 @@ public class Graph{
         }
         return null;
     }
-
 }
