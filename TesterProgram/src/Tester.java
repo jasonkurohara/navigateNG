@@ -1,10 +1,12 @@
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.Stack;
@@ -60,6 +62,10 @@ public class Tester {
         	System.out.println(fullpath.pop().getName());
         }
         System.out.println("END");
+        
+        Map<Vertex, ArrayList<Integer>> truemap = new HashMap<Vertex, ArrayList<Integer>>();
+        truemap = loadBTMapping();
+
 	}
 
     public static Graph textParser() throws Exception {
@@ -220,6 +226,50 @@ public class Tester {
         public int compare(Vertex start, Vertex end){
             return (int)(start.getPriority() - end.getPriority());
         }
+    }
+    
+    //Loads in truth data to truMap
+    public static Map<Vertex, ArrayList<Integer>> loadBTMapping() throws FileNotFoundException {
+        Map<Vertex, ArrayList<Integer>> map = new HashMap<Vertex, ArrayList<Integer>>();
+
+        String data = "";
+        StringBuffer sbuffer = new StringBuffer();
+        InputStream is = new FileInputStream("truemap"); //Change to device names
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+        if (is != null) {
+            try {
+                while ((data = reader.readLine()) != null) {
+                    ArrayList<Integer> signals = new ArrayList<Integer>();
+                    int delimiter = data.indexOf(";");
+                //    System.out.println(Integer.toString(delimiter));
+                    Vertex gridBox = new Vertex();
+                    gridBox.setName(data.substring(0, delimiter));
+                    System.out.println("GRID BOX: " + gridBox.getName());
+                    data = data.substring(delimiter + 1);
+                    while ((delimiter = data.indexOf(",")) != -1 || data.isEmpty()) {
+                    	System.out.println("INSERTED DATA: " + data.substring(0, delimiter));
+                        signals.add(Integer.parseInt(data.substring(0, delimiter)));
+                        data = data.substring(delimiter+1);
+                        System.out.println("DELIMITER POS: " + Integer.toString(delimiter));
+                        
+                    }
+                   
+                    map.put(gridBox, signals);
+                }
+                is.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        for(Vertex current: map.keySet()) {
+        	System.out.print("VERTEX " + current.getName() + ": ");
+        	for( Integer ints : map.get(current)) {
+        		System.out.print( Integer.toString(ints) + ", ");
+        	}
+        	System.out.println();
+        }
+        return map;
     }
 
     
