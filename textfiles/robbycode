@@ -1,0 +1,81 @@
+import java.util.*;
+
+public class track_main {
+
+	public static void main(String[] args, GridBox start, ArrayList<GridBox> path, ArrayList<GridBox> nodes) {
+		// NEED TO FIGURE OUT HOW THESE ARE OBTAINED
+		//GridBox start = null;
+		//ArrayList<GridBox> path = new ArrayList<GridBox>();
+		//ArrayList<GridBox> nodes = new ArrayList<GridBox>(25);
+		
+		GridBox currentBox = start;
+		for(GridBox nextBox:path) {
+			while(currentBox != nextBox) {
+				ArrayList<Double> measurement = getSensorData();
+		        GridBox p = findBox(measurement, currentBox, nodes);
+		        if(p != currentBox){
+		        	changePosition();
+		        	currentBox = p;
+				}
+			}
+		}
+	}
+	
+	public static ArrayList<Double> getSensorData() {
+		return null;
+	}
+	
+	public static GridBox findBox(ArrayList<Double> measurement, GridBox currentBox, ArrayList<GridBox> nodes)
+	{
+		int index = 0;
+		int multiplier = 1; //Number of standard deviations in the acceptable interval
+		int maxSimScore = 0;
+		ArrayList<Integer> simScore = new ArrayList<Integer>(25);
+		ArrayList<GridBox> duplicates = new ArrayList<GridBox>();
+		for(GridBox point:nodes) {
+			index++;
+			for(int i = 0; i < measurement.size(); i++) {
+				if(measurement.get(i) > point.getAverage().get(i) + multiplier*point.getStandardDeviations().get(i)|| measurement.get(i) < point.getAverage().get(i) - multiplier*point.getStandardDeviations().get(i)) {
+					continue;
+				}
+				simScore.set(index, simScore.get(index)+1);
+			}
+			if(simScore.get(index) > maxSimScore) {
+				maxSimScore = simScore.get(index);
+				if(duplicates.size() > 1) {
+					duplicates.clear();
+				}
+				duplicates.add(point);
+			}
+			else if(maxSimScore > 0 && simScore.get(index) == maxSimScore) {
+				duplicates.add(point);
+			}
+		}
+		if(duplicates.size() == 1) {
+			return duplicates.get(1);
+		}
+		return getClosestBox(currentBox, duplicates);
+	}
+	
+	private static void changePosition() {
+		
+	}
+	
+	private static GridBox getClosestBox(GridBox currentBox, ArrayList<GridBox> duplicates) {
+		if(duplicates.contains(currentBox)) {
+			return currentBox;
+		}
+		double minimumDistance = 10000.0;
+		GridBox closestBox = null;
+		for(GridBox box:duplicates) {
+			Vertex loc = box.getLocation();
+			double distance = Math.sqrt(loc.getX()^2 + loc.getY()^2);
+			if(distance < minimumDistance) {
+				minimumDistance = distance;
+				closestBox = box;
+			}
+		}
+		return closestBox;
+	}
+
+}

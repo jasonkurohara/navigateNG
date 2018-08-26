@@ -1,0 +1,55 @@
+TITLE
+Sample Building Layout
+VERTEX
+Room 412D,99,200
+Room 412C,99,245
+Room 412B,99,290
+Room 412A,99,338
+Room 411,128,338
+Room 409,212,338
+Room 407,303,338
+Room 405,388,338
+Common Area,280,290
+Elevator,280,250
+Room 414,99,148
+Room 416,182,148
+Room 418,290,148
+Room 420,366,148
+Room 422A,480,100
+Room 422B,550,100
+Room 422C,578,100
+Room 422D,578,125
+Room 422E,578,170
+RAD,454,148
+Balcony,458,338
+East Stairs,458,380
+West Stairs,182,148
+T intersection 409 & 407,280,338
+Corner 422,454,100
+EDGES
+Room 414,Room 412D
+Room 414,Room 416
+Room 412D,Room 412C 
+Room 412C,Room 412B
+Room 412B,Room 412A
+Room 412A,Room 411
+Room 411,Room 409
+Room 409,T intersection 409 & 407
+T intersection 409 & 407,Room 407
+T intersection 409 & 407,Common Area
+Common Area, Elevator
+Elevator,Room 418
+Room 418,Room 416  
+Room 420,Room 418
+Room 420,RAD
+RAD, Corner 422
+Corner 422,Room 422A
+Room 422A,Room 422B
+Room 422B,Room 422C
+Room 422C,Room 422D
+Room 422D,Room 422E
+Room 407,Room 405
+Room 405,Balcony
+Balcony,East Stairs
+Room 414,West Stairs
+West Stairs,Room 418

@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">NavigateNG</string>
+    <string name="map">map</string>
+    <string name="title_activity_localize">LocalizeActivity</string>
+    <string name="on_off">ON/OFF</string>
+    <string name="scan_devices">SCAN DEVICES</string>
+    <string name="rssi">RSSI</string>
+    <string name="device_address">DEVICE ADDRESS</string>
+    <string name="available_devices">Available Devices</string>
+    <string name="localization">LOCALIZATION</string>
+    <string name="get_directions">Get directions</string>
+    <string name="navigateng">NavigateNG</string>
+    <string name="localize">LOCALIZE</string>
+    <string name="navigate">Navigate</string>
+
+    <string name="start">START</string>
+    <string name="end">END</string>
+    <string name="ng_logo">ng logo</string>
+    <string name="ng_string_ng_logo">ng @string/ng_logo</string>
+    <string name="run">RUN</string>
+    <string name="go">GO</string>
+
+
+    <string-array name="pointA">
+        <item>start1</item>
+        <item>start2</item>
+    </string-array>
+
+    <string-array name="pointB">
+        <item>end1</item>
+        <item>end2</item>
+    </string-array>
+    <string name="title_activity_find_me">FindMeActivity</string>
+    <string name="find_me">FIND ME</string>
+    <string name="directions">DIRECTIONS</string>
+    <string name="todo">TODO</string>
+</resources>
